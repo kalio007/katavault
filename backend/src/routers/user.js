@@ -5,6 +5,8 @@
  * Contains the routes details for 'User' access
  */
 const express = require('express');
+const bcrypt = require('bcrypt');
+require('dotenv').config();
 const User = require('../models/user.js');
 
 const router = new express.Router();
@@ -34,7 +36,19 @@ router.get('/register', (req, res) => {
 
 // POST /register -> Register a new user
 router.post('/register', async (req, res) => {
-  
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const phoneNumber = req.body.phoneNumber;
+  const regNumber = req.body.regNumber;
+  const email = req.body.email;
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
+
+  if (password !== confirmPassword) {
+    return res.status(400).send({status: "Error", reason: "Invalid Password"});
+  }
+  // TODO: Generate salt and hash the password
+  // TODO: Create the user and insert into the database
 });
 
 //GET /user/:id -> Displays a specific user's info

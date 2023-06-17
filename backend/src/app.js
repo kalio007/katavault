@@ -25,6 +25,7 @@ hbs.registerPartials(partialsPath);
 // Enables express to work with static data and assets.
 app.use(express.static(staticPath));
 app.use(express.json());
+app.use(express.urlencoded({extended: false}))
 app.use(userRouter)
 
 
