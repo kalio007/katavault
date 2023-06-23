@@ -1,13 +1,14 @@
 'use strict';
 /**
  * user.js
- * 
+ *
  * Contains the definition for a new 'User' data model
  */
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const validator = require('validator');
 
-const User = mongoose.model('User', {
+const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
@@ -27,7 +28,7 @@ const User = mongoose.model('User', {
     // TODO: Look for a way to use regular expressions to make the
     // validation more precise and accurate.
     validate(value) {
-      if (!validator.isNumeric(value, { no_symbols: true })) {
+      if (!validator.isNumeric(value, {no_symbols: true})) {
         throw new Error('Registration number consists of numerals only');
       }
     }
@@ -45,6 +46,7 @@ const User = mongoose.model('User', {
   email: {
     type: String,
     trim: true,
+    unique: true,
     lowercase: true,
     validate(value) {
       if (!validator.isEmail(value)) {
@@ -59,5 +61,30 @@ const User = mongoose.model('User', {
     minLength: 8
   }
 });
+
+userSchema.statics.findByCredentials = async ({regNumber, email, password}) => {
+  const user = await User.findOne({regNumber, email});
+
+  if (!user) {
+    throw new Error('Unable to login');
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    throw new Error('Unable to login');
+  }
+
+  return user;
+};
+
+userSchema.pre('save', async function (next) {
+  const user = this;
+  const salt = await bcrypt.genSalt(Number(process.env.SALT_ROUNDS));
+  user.password = await bcrypt.hash(user.password, salt);
+  next();
+});
+
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;

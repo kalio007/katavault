@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "api-start": "nodemon backend/src/app.js -e js,hbs",
-    "api-build": "node backend/src/app.js"
+    "api-start": "nodemon backend/app.js",
+    "api-build": "node backend/app.js"
   },
   "keywords": [],
   "author": "",
